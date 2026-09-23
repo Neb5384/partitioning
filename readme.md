@@ -1,0 +1,1 @@
+meteo data source: https://data.geo.admin.ch/ch.meteoschweiz.ogd-nbcn/sio/ogd-nbcn_sio_d_historical.csv
