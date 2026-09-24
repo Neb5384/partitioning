@@ -16,4 +16,4 @@ python demo/partitioning.py && python demo/request.py
 
 ## Data
 
-[MeteoSwiss OGD-NBCN, Sion, daily historical](https://data.geo.admin.ch/ch.meteoschweiz.ogd-nbcn/sio/ogd-nbcn_sio_d_historical.csv)
+[MeteoSwiss, Sion, daily](https://data.geo.admin.ch/ch.meteoschweiz.ogd-nbcn/sio/ogd-nbcn_sio_d_historical.csv)
