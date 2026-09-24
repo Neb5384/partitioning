@@ -11,7 +11,7 @@ print(df.info())
 #formatting date time correctly and giving day and year their own columns----------
 df["reference_timestamp"] = pd.to_datetime(
     df["reference_timestamp"], format="%d.%m.%Y %H:%M"
-)
+).astype("datetime64[us]")
 df["year"] = df["reference_timestamp"].dt.year.astype("int16")
 df["date"] = df["reference_timestamp"].dt.strftime("%Y-%m-%d")
 
