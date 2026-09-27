@@ -10,10 +10,12 @@ SRC = "demo/data/parquet/by_year"
 BY_DAY = "demo/data/delta/by_day"
 BY_YEAR = "demo/data/delta/by_year"
 DAY = "2025-06-07"
+DAY_YEAR = int(DAY[:4])
 Y0, Y1 = 2023, 2025
+Y0_START, Y1_END = f"{Y0}-01-01", f"{Y1}-12-31"
 
 #building a spark session with delta lake support--------
-builder = (SparkSession.builder.master("local[4]").appName("demo")
+builder = (SparkSession.builder.master("local[*]").appName("demo")
            .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") # registers Delta's SQL parser extensions
            .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") # tells Spark's default catalog to resolve tables via Delta's catalog implementation
            .config("spark.ui.showConsoleProgress", "false")) # removes progress bar
@@ -27,12 +29,12 @@ for path, col in [(BY_DAY, "date"), (BY_YEAR, "year")]:
     if not os.path.exists(path):
         spark.read.parquet(SRC).repartition(col).write.format("delta").partitionBy(col).save(path)
 
-#4 benchmark cases-----------------------
+#4 benchmark cases----------------------
 cases = [
-    ("day",  "1 day",   BY_DAY,  F.col("date") == DAY),
-    ("year", "1 day",   BY_YEAR, F.col("date") == DAY),
-    ("day",  "3 years", BY_DAY,  F.col("year").between(Y0, Y1)),
-    ("year", "3 years", BY_YEAR, F.col("year").between(Y0, Y1)),
+    ("day",  "1 day",   BY_DAY,  (F.col("date") == DAY)              & (F.col("year") == DAY_YEAR)),
+    ("year", "1 day",   BY_YEAR, (F.col("date") == DAY)              & (F.col("year") == DAY_YEAR)),
+    ("day",  "3 years", BY_DAY,  (F.col("year").between(Y0, Y1))     & (F.col("date").between(Y0_START, Y1_END))),
+    ("year", "3 years", BY_YEAR, (F.col("year").between(Y0, Y1))     & (F.col("date").between(Y0_START, Y1_END))),
 ]
 
 
@@ -59,6 +61,6 @@ for layout, query, path, condition in cases:
         f, secs = run(query, path, condition)
         times.append(secs)
     files = f.select(F.input_file_name()).distinct().count()   # files that survive the pruning
-    print(f"{layout:<7}{query:<9}{sorted(times)[2]:>9.2f}{files:>8}")
+    print(f"{layout:<7}{query:<9}{sorted(times)[3]:>9.2f}{files:>8}")
 
 spark.stop()
