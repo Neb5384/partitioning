@@ -61,6 +61,6 @@ for layout, query, path, condition in cases:
         f, secs = run(query, path, condition)
         times.append(secs)
     files = f.select(F.input_file_name()).distinct().count()   # files that survive the pruning
-    print(f"{layout:<7}{query:<9}{sorted(times)[3]:>9.2f}{files:>8}")
+    print(f"{layout:<7}{query:<9}{sorted(times)[2]:>9.2f}{files:>8}")
 
 spark.stop()
